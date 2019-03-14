@@ -16,6 +16,7 @@ router.get('/', passport.authenticate('jwt', { session: false }), (req, res) => 
   const masterDb = mongoose.connection.useDb('master');
   const userInfo = masterDb.model('user', UserSchema); 
 
+  // get all user data
   userInfo.find().select('-password')
   .then(result => {
     res.status(200).json(result);
@@ -46,7 +47,7 @@ router.post(
   (req, res) => {
 
     const jwtFromReq = ExtractJwt.fromAuthHeaderAsBearerToken()(req);
-    // Find user and update photo
+    // Find user and remove existing token from db
     User.findOne({ 'id': req.user.id })
     .then(user => {
       user.tokens = user.tokens.filter(token => token !== jwtFromReq);

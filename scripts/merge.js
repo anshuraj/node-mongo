@@ -20,6 +20,7 @@ connection.model('post')
   }]).exec(function(err, results) {
     let userPosts = {};
 
+    // Creating a key value pair for each user and it's posts
     results.forEach(post => {
       if (userPosts[post.userId]) {
         userPosts[post.userId].push(post);
@@ -28,6 +29,7 @@ connection.model('post')
       }
     });
 
+    // Traverse and insert posts in user's db
     for (let user in userPosts) {
       const userDb = mongoose.connection.useDb(user);
       const posts = userDb.model('post', PostSchema);

@@ -12,6 +12,7 @@ module.exports = function (req, res, next) {
     const jwtFromReq = ExtractJwt.fromAuthHeaderAsBearerToken()(req);
     const decoded = jwt.verify(jwtFromReq, 'secret');
     
+    // Checking if token exist in user's record
     User.find({'id': decoded.id})
     .then(user => {
       const {tokens} = user[0];

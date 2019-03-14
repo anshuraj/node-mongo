@@ -10,6 +10,7 @@ const tokenCheck = require('./tokenCheck');
 const user = require('./routes/api/user');
 const post = require('./routes/api/post');
 
+// Creating application
 const app = express();
 
 // Db connection
@@ -27,6 +28,7 @@ require('./config/passport')(passport);
 
 app.use(tokenCheck);
 
+// File upload middleware
 const upload = multer({ dest: './uploads/',
   rename: function (fieldname, filename) {
     return filename;
@@ -35,6 +37,7 @@ const upload = multer({ dest: './uploads/',
 
 app.use(upload.single('photo'));
 
+// App routes
 app.use('/user', user);
 app.use('/posts', post);
 
