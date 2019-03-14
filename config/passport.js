@@ -13,7 +13,7 @@ module.exports = passport => {
     User.find({'id': jwt_payload.id})
       .then(user => {
         if (user) {
-          return done(null, user);
+          return done(null, user[0]);
         }
         return done(null, false);
       })
