@@ -17,7 +17,7 @@ const UserSchema = new Schema({
   },
   password: {
     type: String,
-    default: 'secret'
+    default: '$2a$12$peX8oLM5U8IBqOhheFBB6ORCQi5E5z1lJLb1SXz7FAjPE6RqxfiVi'
   },
   address: {
     type: Object,
