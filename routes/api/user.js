@@ -7,6 +7,7 @@ const passport = require('passport');
 const fs = require('fs');
 const ExtractJwt = require('passport-jwt').ExtractJwt;
 
+const Keys = require('../../config/keys');
 
 const { UserSchema, User } = require('../../model/User');
 const validateLoginInput = require('../../validator/login');
@@ -73,7 +74,6 @@ router.post('/login', (req, res) => {
         errors.email = 'User not found'
         return res.status(404).json(errors);
       }
-      console.log(user);
 
       // Check password
       bcrypt.compare(password, user.password)
@@ -88,7 +88,7 @@ router.post('/login', (req, res) => {
             // Generate JWT
             jwt.sign(
               payload,
-              'secret',
+              Keys.secret,
               { expiresIn: 86400 },
               (err, token) => {
                 user.tokens = [...user.tokens, token];

@@ -6,7 +6,6 @@ const {User} = require('./model/User');
 const jwt = require('jsonwebtoken');
 
 module.exports = function (req, res, next) {
-  console.log(req.url);
   if (req.url === '/user/login') {
     next();
   } else {
