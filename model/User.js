@@ -35,6 +35,20 @@ const UserSchema = new Schema({
     type: Object,
     required: true
   },
+  photo: {
+    src: {
+      type: String,
+      required: false
+    },
+    contentType: {
+      type: String,
+      required: false
+    },
+    filename: {
+      type: String,
+      required: false
+    }
+  }
 });
 
 const User = mongoose.model('user', UserSchema)

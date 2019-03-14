@@ -1,11 +1,9 @@
-const express = require('express');
 const axios = require('axios');
 const mongoose = require('mongoose');
-const router = express.Router();
 
-const { UserSchema } = require('../../model/User');
-const { PostSchema } = require('../../model/Post');
-const { CommentSchema } = require('../../model/Comment');
+const { UserSchema } = require('../model/User');
+const { PostSchema } = require('../model/Post');
+const { CommentSchema } = require('../model/Comment');
 
 const usersURL = 'https://jsonplaceholder.typicode.com/users';
 const postsURL = 'https://jsonplaceholder.typicode.com/posts';
@@ -17,16 +15,20 @@ const resourcesToFetch = [
   axios.get(commentURL)
 ];
 
-router.get('/', (req, res) => {
+const db = require('../config/keys').mongoURI;
+mongoose
+  .connect(db, { useNewUrlParser: true })
+  .then(()=> console.log('Connected to db!'))
+  .catch((err) => console.log(err));
+
+function load() {
   axios.all(resourcesToFetch)
     .then(axios.spread(function (users, posts, comments) {
       insertUserData(users.data);
       insertPostsData(posts.data);
       insertCommentsData(comments.data);
-
-      res.json({ msg: "Data inserted!" });
     }));
-});
+}
 
 function insertUserData(users) {
   // Creating connection for master db
@@ -70,4 +72,4 @@ function insertCommentsData(comments) {
   });
 }
 
-module.exports = router;
+load();

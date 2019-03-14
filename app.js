@@ -2,14 +2,11 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const passport = require('passport');
+const multer = require('multer');
 
 // Loading routes
 const user = require('./routes/api/user');
 const post = require('./routes/api/post');
-
-// Scripts
-const loadData = require('./routes/scripts/loadData');
-const mergePostWithComments = require('./routes/scripts/mergePostWithComments');
 
 const app = express();
 
@@ -24,15 +21,18 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 app.use(passport.initialize());
-
 require('./config/passport')(passport);
+
+const upload = multer({ dest: './uploads/',
+  rename: function (fieldname, filename) {
+    return filename;
+  },
+});
+
+app.use(upload.single('photo'));
 
 app.use('/user', user);
 app.use('/posts', post);
-
-// Data loading scripts
-app.use('/loaddata', loadData);
-app.use('/merge', mergePostWithComments);
 
 const port = process.env.PORT || 5000;
 

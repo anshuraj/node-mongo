@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const passport = require('passport');
+const fs = require('fs');
 
 const { UserSchema, User } = require('../../model/User');
 const validateLoginInput = require('../../validator/login');
@@ -14,9 +15,27 @@ router.get('/', passport.authenticate('jwt', { session: false }), (req, res) => 
 
   userInfo.find().select('-password')
   .then(result => {
-    res.json(result);
-  });
+    res.status(200).json(result);
+  })
+  .catch(() => res.status(400).json({message: 'Error occured'}));  
 });
+
+router.post(
+  '/updatephoto',
+  passport.authenticate('jwt', { session: false }),
+  (req, res) => {
+    // Find user and update photo
+    User.findOne({ 'id': req.user.id })
+    .then(user => {
+      user.photo.src = req.file.path;
+      user.photo.filename = req.file.filename;
+      user.photo.contentType = req.file.mimetype;
+      user.save()
+      .then(() => res.json({message: 'Photo saved'}))
+      .catch(() => res.status(400).json({message: "Error occured"}));
+      });
+  }
+);
 
 router.post('/login', (req, res) => {
   const { email, password } = req.body;
