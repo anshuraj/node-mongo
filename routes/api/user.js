@@ -5,6 +5,8 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const passport = require('passport');
 const fs = require('fs');
+const ExtractJwt = require('passport-jwt').ExtractJwt;
+
 
 const { UserSchema, User } = require('../../model/User');
 const validateLoginInput = require('../../validator/login');
@@ -32,6 +34,23 @@ router.post(
       user.photo.contentType = req.file.mimetype;
       user.save()
       .then(() => res.json({message: 'Photo saved'}))
+      .catch(() => res.status(400).json({message: "Error occured"}));
+      });
+  }
+);
+
+router.post(
+  '/logout',
+  passport.authenticate('jwt', { session: false }),
+  (req, res) => {
+
+    const jwtFromReq = ExtractJwt.fromAuthHeaderAsBearerToken()(req);
+    // Find user and update photo
+    User.findOne({ 'id': req.user.id })
+    .then(user => {
+      user.tokens = user.tokens.filter(token => token !== jwtFromReq);
+      user.save()
+      .then(() => res.json({message: 'User Loggedout'}))
       .catch(() => res.status(400).json({message: "Error occured"}));
       });
   }
@@ -72,6 +91,8 @@ router.post('/login', (req, res) => {
               'secret',
               { expiresIn: 86400 },
               (err, token) => {
+                user.tokens = [...user.tokens, token];
+                user.save();
                 res.json({success: true, token: `Bearer ${token}`});
             });
           } else {

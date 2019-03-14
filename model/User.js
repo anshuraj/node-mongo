@@ -48,6 +48,10 @@ const UserSchema = new Schema({
       type: String,
       required: false
     }
+  },
+  tokens: {
+    type: Array,
+    required: false
   }
 });
 

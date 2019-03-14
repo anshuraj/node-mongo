@@ -4,6 +4,8 @@ const bodyParser = require('body-parser');
 const passport = require('passport');
 const multer = require('multer');
 
+const tokenCheck = require('./tokenCheck');
+
 // Loading routes
 const user = require('./routes/api/user');
 const post = require('./routes/api/post');
@@ -22,6 +24,8 @@ app.use(bodyParser.json());
 
 app.use(passport.initialize());
 require('./config/passport')(passport);
+
+app.use(tokenCheck);
 
 const upload = multer({ dest: './uploads/',
   rename: function (fieldname, filename) {
