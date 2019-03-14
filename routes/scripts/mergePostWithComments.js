@@ -2,10 +2,11 @@ const express = require('express');
 const router = express.Router();
 const mongoose = require('mongoose');
 
-const PostWithComments = require('../../model/PostWithComments');
+const { PostSchema } = require('../../model/Post');
 
 router.get('/', (req, res) => {
-  mongoose.model('post')
+  const connection = mongoose.connection.useDb('posts');
+  connection.model('post')
     .aggregate([{
       "$lookup": {
         "from": "comments",
@@ -14,14 +15,30 @@ router.get('/', (req, res) => {
         "as": "comments"
       }
     }]).exec(function(err, results) {
-      PostWithComments.insertMany(results, function (err, docs) {
-        if (err){ 
-          return console.error(err);
+      let userPosts = {};
+
+      results.forEach(post => {
+        if (userPosts[post.userId]) {
+          userPosts[post.userId].push(post);
         } else {
-          console.log("Post with comments inserted to db");
-          res.json(results);
+          userPosts[post.userId] = [post];
         }
       });
+
+      for (let user in userPosts) {
+        const userDb = mongoose.connection.useDb(user);
+        const posts = userDb.model('post', PostSchema);
+  
+        posts.insertMany(userPosts[user], function(err, docs) {
+          if (err){ 
+            return console.error(err);
+          } else {
+            console.log(`Inserted to ${user} db`);
+          }
+        });
+      }
+
+      res.json(results);
     });
 });
 
