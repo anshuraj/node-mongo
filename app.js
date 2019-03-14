@@ -8,9 +8,7 @@ const user = require('./routes/api/user');
 const post = require('./routes/api/post');
 
 // Scripts
-const loadUsers = require('./routes/scripts/loadUsers');
-const loadPosts = require('./routes/scripts/loadPosts');
-const loadComments = require('./routes/scripts/loadComments');
+const loadData = require('./routes/scripts/loadData');
 const mergePostWithComments = require('./routes/scripts/mergePostWithComments');
 
 const app = express();
@@ -18,7 +16,7 @@ const app = express();
 // Db connection
 const db = require('./config/keys').mongoURI;
 mongoose
-  .connect('mongodb://localhost/posts', { useNewUrlParser: true })
+  .connect(db, { useNewUrlParser: true })
   .then(()=> console.log('Connected to db!'))
   .catch((err) => console.log(err));
 
@@ -33,9 +31,7 @@ app.use('/user', user);
 app.use('/posts', post);
 
 // Data loading scripts
-app.use('/loadusers', loadUsers);
-app.use('/loadposts', loadPosts);
-app.use('/loadcomments', loadComments);
+app.use('/loaddata', loadData);
 app.use('/merge', mergePostWithComments);
 
 const port = process.env.PORT || 5000;
